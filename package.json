@@ -1,0 +1,13 @@
+{
+  "name": "js-daily-quiz",
+  "version": "1.0.0",
+  "description": "JS Daily Quiz with daily ntfy.sh notifications via Vercel cron",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@vercel/kv": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

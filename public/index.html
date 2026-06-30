@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <title>JS Daily Quiz – Kartik's Notes</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+    :root {
+      --bg: #0d0f14;
+      --surface: #141720;
+      --card: #1a1f2e;
+      --border: #252b3d;
+      --accent: #f7c948;
+      --accent2: #4f8ef7;
+      --green: #3dd68c;
+      --red: #f75f5f;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --code-bg: #0a0c10;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 60px;
+    }
+
+    /* ── Header ── */
+    .header {
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-badge {
+      background: var(--accent);
+      color: #0d0f14;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.05em;
+    }
+
+    .logo-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      opacity: 0.9;
+    }
+
+    .streak-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+    }
+
+    /* ── Topics sidebar / tabs ── */
+    .topics-row {
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .topic-chip {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .topic-chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .topic-chip.active {
+      background: var(--accent);
+      color: #0d0f14;
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* ── Main card ── */
+    .card {
+      width: 100%;
+      max-width: 720px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .card-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .diff-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .diff-easy {
+      background: #1a3d2b;
+      color: var(--green);
+    }
+
+    .diff-medium {
+      background: #2d2a10;
+      color: var(--accent);
+    }
+
+    .diff-hard {
+      background: #3d1a1a;
+      color: var(--red);
+    }
+
+    .card-body {
+      padding: 28px 24px;
+    }
+
+    .question-text {
+      font-size: 18px;
+      font-weight: 500;
+      line-height: 1.6;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    /* code inside question */
+    .question-text code {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 14px;
+      color: var(--accent);
+    }
+
+    /* ── Options ── */
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .option {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 15px;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .option:hover:not(.disabled) {
+      border-color: var(--accent2);
+      color: var(--accent2);
+    }
+
+    .opt-key {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+      color: var(--muted);
+    }
+
+    .option.correct {
+      border-color: var(--green);
+      background: #0d2419;
+    }
+
+    .option.correct .opt-key {
+      background: var(--green);
+      color: #0d0f14;
+      border-color: var(--green);
+    }
+
+    .option.wrong {
+      border-color: var(--red);
+      background: #2a0e0e;
+    }
+
+    .option.wrong .opt-key {
+      background: var(--red);
+      color: #fff;
+      border-color: var(--red);
+    }
+
+    .option.disabled {
+      cursor: default;
+    }
+
+    /* code block */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      overflow-x: auto;
+      margin: 16px 0;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    pre code {
+      font-family: 'JetBrains Mono', monospace;
+      color: #c9d1d9;
+    }
+
+    .kw {
+      color: #ff79c6;
+    }
+
+    .fn {
+      color: #8be9fd;
+    }
+
+    .str {
+      color: #f1fa8c;
+    }
+
+    .cm {
+      color: #6272a4;
+      font-style: italic;
+    }
+
+    .num {
+      color: #bd93f9;
+    }
+
+    /* ── Explanation panel ── */
+    .explanation {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+
+    .explanation.show {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .exp-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent2);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .exp-text {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--text);
+      opacity: 0.9;
+    }
+
+    /* ── Buttons ── */
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0d0f14;
+      flex: 1;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      filter: brightness(1.1);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      width: 100%;
+      max-width: 720px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Notification setup ── */
+    .notif-panel {
+      width: 100%;
+      max-width: 720px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .notif-info {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .notif-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .notif-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .notif-time-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .time-input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      width: 110px;
+    }
+
+    .time-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    /* ── Loading ── */
+    .loading {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      padding: 20px 0;
+      justify-content: center;
+    }
+
+    .loading.show {
+      display: flex;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ── Progress bar ── */
+    .progress-wrap {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      margin-bottom: 28px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+
+    /* ── Congrats ── */
+    .congrats {
+      text-align: center;
+      padding: 40px 24px;
+      display: none;
+    }
+
+    .congrats.show {
+      display: block;
+    }
+
+    .congrats-emoji {
+      font-size: 56px;
+      margin-bottom: 16px;
+    }
+
+    .congrats-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .congrats-sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    /* ── Alarm set toast ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--green);
+      color: #0d0f14;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform 0.3s ease;
+      z-index: 999;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── Settings Gear Button ── */
+    .settings-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text);
+      transition: all 0.2s;
+      font-size: 16px;
+    }
+
+    .settings-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: rotate(45deg);
+    }
+
+    /* ── Modal ── */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(10, 12, 16, 0.8);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 480px;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      transform: scale(0.95);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-backdrop.show .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 24px;
+      cursor: pointer;
+      transition: color 0.2s;
+      line-height: 1;
+    }
+
+    .modal-close:hover {
+      color: var(--red);
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      width: 100%;
+    }
+
+    .input-control {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-size: 14px;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+
+    .input-control:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .input-control-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px;
+    }
+
+    .input-control-btn:hover {
+      color: var(--text);
+    }
+
+    .input-hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.45;
+    }
+
+    .flex-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      width: 100%;
+    }
+
+    select.input-control {
+      appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg fill='%2364748b' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 18px;
+      padding-right: 32px;
+    }
+
+    @media (max-width: 500px) {
+      .question-text {
+        font-size: 16px;
+      }
+
+      .stats-bar {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .card-body {
+        padding: 20px 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <div class="logo">
+      <span class="logo-badge">JS</span>
+      <span class="logo-title">Daily Quiz · Kartik's Notes</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <div class="streak-badge">🔥 <span id="streakNum">0</span> day streak</div>
+      <button class="settings-btn" onclick="toggleSettingsModal(true)" title="Settings">⚙️</button>
+    </div>
+  </div>
+
+  <!-- Topic filter -->
+  <div class="topics-row" id="topicsRow"></div>
+
+  <!-- Main quiz card -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title" id="cardTopicLabel">–</span>
+      <span class="diff-badge diff-medium" id="diffBadge">Medium</span>
+    </div>
+    <div class="card-body">
+      <div class="progress-wrap">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+
+      <div class="loading" id="loadingDiv">
+        <div class="spinner"></div> Generating question…
+      </div>
+
+      <div id="quizSection">
+        <p class="question-text" id="questionText">Press "Generate Question" to start your quiz 🚀</p>
+        <div class="options" id="optionsDiv"></div>
+        <div class="explanation" id="explanationDiv">
+          <div class="exp-label">💡 Explanation</div>
+          <div class="exp-text" id="explanationText"></div>
+        </div>
+      </div>
+
+      <div class="congrats" id="congratsDiv">
+        <div class="congrats-emoji">🎉</div>
+        <div class="congrats-title">Quiz Complete!</div>
+        <div class="congrats-sub" id="congratsSub"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="generateBtn" onclick="generateQuestion()">Generate Question ⚡</button>
+        <button class="btn btn-secondary" id="nextBtn" onclick="nextQuestion()" disabled>Next →</button>
+        <button class="btn btn-secondary" onclick="resetSession()">↺ Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <span class="stat-num" id="statTotal">0</span>
+      <div class="stat-label">Total Asked</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num" id="statCorrect" style="color:var(--green)">0</span>
+      <div class="stat-label">Correct</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num" id="statWrong" style="color:var(--red)">0</span>
+      <div class="stat-label">Wrong</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num" id="statPct">–</span>
+      <div class="stat-label">Accuracy</div>
+    </div>
+  </div>
+
+  <!-- Notification / alarm panel -->
+  <div class="notif-panel">
+    <div class="notif-info">
+      <div class="notif-title">📅 Daily Phone Reminder</div>
+      <div class="notif-sub">Set a time to get daily notifications on your phone via ntfy.sh.</div>
+      <div style="font-size: 11px; margin-top: 6px; color: var(--accent2);" id="activeTopicBadge">Active Topic: None
+      </div>
+    </div>
+    <div class="notif-time-row">
+      <input type="time" class="time-input" id="alarmTime" value="21:00" />
+      <button class="btn btn-primary" style="flex:none; padding:10px 18px;" onclick="setDailyAlarm()">Set Alarm</button>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">⚙️ Quiz Settings</h3>
+        <button class="modal-close" onclick="toggleSettingsModal(false)">&times;</button>
+      </div>
+
+      <div class="form-group">
+        <label for="geminiKey">Gemini API Key</label>
+        <div class="input-wrapper">
+          <input type="password" class="input-control" id="geminiKey" placeholder="Enter API Key (AIzaSy...)"
+            style="padding-right: 40px;" />
+          <button class="input-control-btn" id="toggleKeyBtn" onclick="toggleKeyVisibility()">👁️</button>
+        </div>
+        <p class="input-hint">Your API key is stored locally in your browser's localStorage. Get a free API key from <a
+            href="https://aistudio.google.com/" target="_blank"
+            style="color: var(--accent2); text-decoration: none;">Google AI Studio</a>.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="geminiModel">Gemini Model</label>
+        <select class="input-control" id="geminiModel">
+          <option value="gemini-2.5-flash">gemini-2.5-flash (Recommended, Fast & Smart)</option>
+          <option value="gemini-1.5-flash">gemini-1.5-flash (Standard, Fast)</option>
+          <option value="gemini-1.5-pro">gemini-1.5-pro (Capable, Slower)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="ntfyTopic">ntfy.sh Phone Notification Topic</label>
+        <div class="flex-row">
+          <input type="text" class="input-control" id="ntfyTopic" placeholder="e.g., js-quiz-kartik-123" oninput="updateNtfyQRCode()" />
+          <button class="btn btn-secondary" style="padding: 10px 10px; flex: none;" onclick="copyNtfyTopic()">Copy</button>
+          <button class="btn btn-secondary" style="padding: 10px 10px; flex: none;" onclick="openNtfyTopic()" title="Open subscription webpage">🌐 View</button>
+          <button class="btn btn-secondary" style="padding: 10px 10px; flex: none;" onclick="regenerateNtfyTopic()" title="Regenerate random topic">🔄</button>
+        </div>
+        <p class="input-hint">To receive notifications on your phone:<br>1. Download the free <strong>ntfy</strong> app (Android/iOS).<br>2. Subscribe/add the topic above in the app.<br>3. Keep notifications enabled.</p>
+      </div>
+
+      <div class="form-group" style="display: flex; flex-direction: column; align-items: center; background: var(--surface); padding: 16px; border-radius: 12px; border: 1px solid var(--border); margin-top: 16px;">
+        <label style="margin-bottom: 8px; color: var(--accent); font-weight: 600;">Scan to Subscribe Instantly</label>
+        <div id="qrcode-container" style="background: white; padding: 10px; border-radius: 8px; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center;">
+          <div id="qrcode-canvas"></div>
+          <div id="qrcode-placeholder" style="color: #64748b; font-size: 12px; font-family: monospace; text-align:center;">Enter topic first</div>
+        </div>
+        <p class="input-hint" style="text-align: center; margin-top: 8px; font-size: 11px;">Scan using your phone's camera or a QR scanner app to automatically open your subscription topic.</p>
+      </div>
+
+      <div class="btn-row" style="margin-top: 24px;">
+        <button class="btn btn-primary" onclick="saveSettings()">Save & Close</button>
+        <button class="btn btn-secondary" onclick="sendTestNotification()">Test Notif 🔔</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ────────────────────────────────────────────────────
+    // DATA – JS topics covered in Kartik's 166-page notes
+    // ────────────────────────────────────────────────────
+    const TOPICS = [
+      { id: "intro", label: "JS Intro", emoji: "🟡" },
+      { id: "datatypes", label: "Data Types", emoji: "🔢" },
+      { id: "variables", label: "Variables", emoji: "📦" },
+      { id: "operators", label: "Operators", emoji: "⚙️" },
+      { id: "functions", label: "Functions", emoji: "🔧" },
+      { id: "scope", label: "Scope & Closures", emoji: "🔭" },
+      { id: "objects", label: "Objects & 'this'", emoji: "🧩" },
+      { id: "arrays", label: "Arrays", emoji: "📋" },
+      { id: "dom", label: "DOM & Events", emoji: "🌐" },
+      { id: "classes", label: "OOP & Classes", emoji: "🏛️" },
+      { id: "async", label: "Async / Promises", emoji: "⏳" },
+      { id: "es6", label: "ES6+ Features", emoji: "✨" },
+    ];
+
+    const TOPIC_DETAIL = {
+      intro: "JavaScript basics: scripting vs programming language, high-level, interpreted, JIT compiled, multi-paradigm, prototype-based, single-threaded, dynamic, synchronous. Why learn JS? Natural progression after HTML/CSS, adds interactivity. JS is both scripting and programming language; everything (numbers, strings, functions) is an object.",
+      datatypes: "Primitive types: Number, String, Boolean, Undefined, Null, BigInt, Symbol. typeof operator. Type coercion: implicit vs explicit. parseInt, parseFloat, Number(), Boolean(), String(). NaN, Infinity. Template literals. String methods: length, toUpperCase, slice, includes, split, trim, replace, indexOf.",
+      variables: "var (function-scoped, hoisted), let (block-scoped, TDZ), const (block-scoped, must initialize). Naming rules: cannot start with number, can use $, _, camelCase. Avoid reserved keywords. Dynamic typing — variable type can change at runtime.",
+      operators: "Arithmetic (+,-,*,/,**,%), comparison (== vs ===, != vs !==), logical (&&,||,!), ternary (?:), nullish coalescing (??), optional chaining (?.), assignment operators. Operator precedence. Truthy/falsy values.",
+      functions: "Function declaration vs expression vs arrow functions. Parameters vs arguments. Default parameters. Rest parameters (...args). IIFE. First-class functions. Higher-order functions (map, filter, reduce). Nested/inner functions. Callback functions. Pure functions.",
+      scope: "Global scope, function scope, block scope. Lexical environment. Closure — inner function retains access to outer function's variables even after outer returns. Hoisting — var declarations hoisted, let/const not. Temporal Dead Zone (TDZ). IIFE for scope isolation.",
+      objects: "'this' keyword — refers to the object executing current code. Object literals. Accessing properties with dot vs bracket notation. Computed property names. Object methods. Constructor functions. new keyword. Object.keys(), Object.values(), Object.entries(), Object.assign(), spread operator. Prototype chain. __proto__.",
+      arrays: "Array creation. push, pop, shift, unshift, splice, slice. indexOf, includes, find, findIndex, filter, map, reduce, forEach, some, every. flat, flatMap. sort (lexicographic by default, needs comparator for numbers). Destructuring. Spread operator. Array.from(), Array.isArray().",
+      dom: "document.getElementById, querySelector, querySelectorAll. innerHTML, textContent, innerText. createElement, appendChild, removeChild. classList (add/remove/toggle). addEventListener — click, mouseover, keydown, submit. Event object (e.target, e.key, e.preventDefault). Event bubbling and capturing. Inline events.",
+      classes: "class keyword (ES6 syntactic sugar). constructor method. Instance methods. static methods. Inheritance with extends. super keyword. Private fields (#). Getters and setters. Prototype-based under the hood. class vs constructor function.",
+      async: "Synchronous vs asynchronous. Callbacks and callback hell. Promise — pending/fulfilled/rejected. .then(), .catch(), .finally(). Promise.all(), Promise.race(). async/await syntax — marks function as async, returns promise; await pauses execution until promise resolves/rejects. Error handling with try/catch in async functions.",
+      es6: "Arrow functions (lexical this). Destructuring (arrays and objects). Default parameters. Rest/spread. Template literals. let/const. import/export modules. for...of loop. Symbol. Map and Set. Optional chaining (?.),  Nullish coalescing (??).",
+    };
+
+    // ────────────────────────────────────────────────────
+    // STATE
+    // ────────────────────────────────────────────────────
+    let activeTopic = null;
+    let sessionStats = { total: 0, correct: 0, wrong: 0 };
+    let answered = false;
+    let currentQuestion = null;
+
+    let settings = {
+      geminiKey: '',
+      geminiModel: 'gemini-2.5-flash',
+      ntfyTopic: ''
+    };
+
+    function toggleSettingsModal(show) {
+      const modal = document.getElementById('settingsModal');
+      if (show) {
+        document.getElementById('geminiKey').value = settings.geminiKey;
+        document.getElementById('geminiModel').value = settings.geminiModel;
+        document.getElementById('ntfyTopic').value = settings.ntfyTopic;
+        updateNtfyQRCode();
+        modal.classList.add('show');
+      } else {
+        modal.classList.remove('show');
+      }
+    }
+
+    function toggleKeyVisibility() {
+      const input = document.getElementById('geminiKey');
+      const btn = document.getElementById('toggleKeyBtn');
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+      }
+    }
+
+    function copyNtfyTopic() {
+      const topic = document.getElementById('ntfyTopic').value.trim();
+      if (!topic) return;
+      navigator.clipboard.writeText(topic).then(() => {
+        showToast("📋 Topic copied to clipboard!");
+      }).catch(() => {
+        showToast("⚠️ Copy failed. Copy manually.");
+      });
+    }
+
+    function openNtfyTopic() {
+      const topic = document.getElementById('ntfyTopic').value.trim();
+      if (!topic) return;
+      window.open(`https://ntfy.sh/${topic}`, '_blank');
+    }
+
+    function regenerateNtfyTopic() {
+      const newTopic = `js-quiz-${Math.random().toString(36).substring(2, 10)}`;
+      document.getElementById('ntfyTopic').value = newTopic;
+      updateNtfyQRCode();
+    }
+
+    function updateNtfyQRCode() {
+      const topicInput = document.getElementById('ntfyTopic');
+      const topic = topicInput ? topicInput.value.trim() : '';
+      const canvas = document.getElementById('qrcode-canvas');
+      const placeholder = document.getElementById('qrcode-placeholder');
+
+      if (!topic) {
+        canvas.innerHTML = '';
+        placeholder.style.display = 'block';
+        return;
+      }
+
+      placeholder.style.display = 'none';
+      canvas.innerHTML = '';
+      try {
+        new QRCode(canvas, {
+          text: `https://ntfy.sh/${topic}`,
+          width: 120,
+          height: 120,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } catch(e) {
+        canvas.innerHTML = '<span style="color:#64748b;font-size:11px;">QR unavailable</span>';
+      }
+    }
+
+    function updateActiveTopicBadge() {
+      const badge = document.getElementById('activeTopicBadge');
+      if (settings.ntfyTopic) {
+        badge.innerHTML = `Active Topic: <a href="https://ntfy.sh/${settings.ntfyTopic}" target="_blank" style="color: var(--accent); text-decoration: underline; font-family: monospace;">${settings.ntfyTopic}</a> (Subscribe here)`;
+      } else {
+        badge.textContent = `Active Topic: None`;
+      }
+    }
+
+    function saveSettings() {
+      const key = document.getElementById('geminiKey').value.trim();
+      const model = document.getElementById('geminiModel').value;
+      const topic = document.getElementById('ntfyTopic').value.trim();
+
+      if (!topic) {
+        showToast("⚠️ ntfy.sh topic is required!");
+        return;
+      }
+
+      settings.geminiKey = key;
+      settings.geminiModel = model;
+      settings.ntfyTopic = topic;
+
+      try {
+        localStorage.setItem('jsQuizSettings', JSON.stringify(settings));
+        showToast("⚙️ Settings saved!");
+        updateActiveTopicBadge();
+      } catch (_) {
+        showToast("⚠️ Failed to save settings");
+      }
+
+      toggleSettingsModal(false);
+    }
+
+    function loadSettings() {
+      try {
+        const s = JSON.parse(localStorage.getItem('jsQuizSettings') || '{}');
+        settings.geminiKey = s.geminiKey || '';
+        settings.geminiModel = s.geminiModel || 'gemini-2.5-flash';
+        settings.ntfyTopic = s.ntfyTopic || `js-quiz-${Math.random().toString(36).substring(2, 10)}`;
+
+        document.getElementById('geminiKey').value = settings.geminiKey;
+        document.getElementById('geminiModel').value = settings.geminiModel;
+        document.getElementById('ntfyTopic').value = settings.ntfyTopic;
+
+        if (!s.ntfyTopic) {
+          localStorage.setItem('jsQuizSettings', JSON.stringify(settings));
+        }
+        updateActiveTopicBadge();
+        updateNtfyQRCode();
+      } catch (_) { }
+    }
+
+    // ────────────────────────────────────────────────────
+    // STORAGE helpers
+    // ────────────────────────────────────────────────────
+    function loadStats() {
+      try {
+        const s = JSON.parse(localStorage.getItem('jsQuizStats') || '{}');
+        sessionStats = { total: s.total || 0, correct: s.correct || 0, wrong: s.wrong || 0 };
+        const streak = s.streak || 0;
+        document.getElementById('streakNum').textContent = streak;
+      } catch (_) { }
+      updateStatsUI();
+    }
+
+    function saveStats() {
+      try {
+        const today = new Date().toDateString();
+        const existing = JSON.parse(localStorage.getItem('jsQuizStats') || '{}');
+        const lastDay = existing.lastDay;
+        let streak = existing.streak || 0;
+        if (lastDay !== today) {
+          const yesterday = new Date(Date.now() - 86400000).toDateString();
+          streak = (lastDay === yesterday) ? streak + 1 : 1;
+        }
+        localStorage.setItem('jsQuizStats', JSON.stringify({
+          ...sessionStats, streak, lastDay: today
+        }));
+        document.getElementById('streakNum').textContent = streak;
+      } catch (_) { }
+    }
+
+    // ────────────────────────────────────────────────────
+    // TOPIC UI
+    // ────────────────────────────────────────────────────
+    function buildTopics() {
+      const row = document.getElementById('topicsRow');
+      TOPICS.forEach(t => {
+        const chip = document.createElement('button');
+        chip.className = 'topic-chip';
+        chip.textContent = `${t.emoji} ${t.label}`;
+        chip.dataset.id = t.id;
+        chip.onclick = () => selectTopic(t.id);
+        row.appendChild(chip);
+      });
+    }
+
+    function selectTopic(id) {
+      activeTopic = id;
+      document.querySelectorAll('.topic-chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.id === id);
+      });
+      const t = TOPICS.find(x => x.id === id);
+      document.getElementById('cardTopicLabel').textContent = `${t.emoji} ${t.label}`;
+    }
+
+    // ────────────────────────────────────────────────────
+    // QUESTION GENERATION via Anthropic API
+    // ────────────────────────────────────────────────────
+    async function generateQuestion() {
+      if (!activeTopic) {
+        showToast("⚡ Pick a topic first!");
+        return;
+      }
+
+      if (!settings.geminiKey) {
+        showToast("🔑 Please set your Gemini API Key in Settings first!");
+        toggleSettingsModal(true);
+        return;
+      }
+
+      setLoading(true);
+      resetQuestionUI();
+      document.getElementById('congratsDiv').classList.remove('show');
+      document.getElementById('quizSection').style.display = 'block';
+
+      const topicObj = TOPICS.find(t => t.id === activeTopic);
+      const topicDetail = TOPIC_DETAIL[activeTopic];
+
+      const prompt = `You are a JavaScript quiz master. Generate ONE multiple-choice quiz question based on this JavaScript topic:
+
+TOPIC: ${topicObj.label}
+CONTENT SCOPE: ${topicDetail}
+
+The question must be from the scope above — only ask about things explicitly in that scope.
+Include a real code snippet in the question where possible.
+Make options specific and realistic — avoid obviously wrong distractors.
+Your response MUST fit the specified JSON schema exactly.`;
+
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${settings.geminiModel}:generateContent?key=${settings.geminiKey}`;
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: "user",
+                parts: [{ text: prompt }]
+              }
+            ],
+            generationConfig: {
+              responseMimeType: "application/json",
+              responseSchema: {
+                type: "object",
+                properties: {
+                  question: { type: "string" },
+                  code: { type: "string", description: "Optional JS code block if needed, or empty string" },
+                  options: {
+                    type: "array",
+                    items: { type: "string" },
+                    description: "Array of exactly 4 strings for options A, B, C, D"
+                  },
+                  correct: { type: "integer", description: "The 0-based index of the correct option (0 to 3)" },
+                  difficulty: { type: "string", enum: ["easy", "medium", "hard"] },
+                  explanation: { type: "string", description: "Clear, detailed explanation of 3-5 sentences" }
+                },
+                required: ["question", "code", "options", "correct", "difficulty", "explanation"]
+              }
+            }
+          })
+        });
+
+        if (!resp.ok) {
+          const errData = await resp.json().catch(() => ({}));
+          throw new Error(errData.error?.message || `HTTP ${resp.status}`);
+        }
+
+        const data = await resp.json();
+        const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        if (!raw.trim()) throw new Error("Received empty response from Gemini API.");
+
+        currentQuestion = JSON.parse(raw.trim());
+
+        if (!currentQuestion.question || !Array.isArray(currentQuestion.options) || currentQuestion.options.length !== 4) {
+          throw new Error("Invalid quiz structure returned by Gemini API.");
+        }
+
+        renderQuestion(currentQuestion);
+
+      } catch (err) {
+        document.getElementById('questionText').innerHTML = `⚠️ Failed to generate question: <br><span style="color:var(--red); font-size: 13px; font-family: monospace; display: block; margin: 10px 0; background: #2a0e0e; padding: 10px; border-radius: 6px; border: 1px solid var(--red);">${err.message}</span>Please verify your API key and model selection in Settings.`;
+        console.error(err);
+      }
+
+      setLoading(false);
+    }
+
+    // ────────────────────────────────────────────────────
+    // RENDER
+    // ────────────────────────────────────────────────────
+    function renderQuestion(q) {
+      answered = false;
+      document.getElementById('nextBtn').disabled = true;
+
+      // Question text
+      const qEl = document.getElementById('questionText');
+      qEl.innerHTML = formatInlineCode(q.question);
+
+      // Code block
+      const existingPre = qEl.parentNode.querySelector('.q-code');
+      if (existingPre) existingPre.remove();
+      if (q.code && q.code.trim()) {
+        const pre = document.createElement('pre');
+        pre.className = 'q-code';
+        pre.innerHTML = `<code>${syntaxHL(escapeHtml(q.code))}</code>`;
+        qEl.insertAdjacentElement('afterend', pre);
+      }
+
+      // Difficulty
+      const diff = q.difficulty || 'medium';
+      const diffEl = document.getElementById('diffBadge');
+      diffEl.textContent = diff.charAt(0).toUpperCase() + diff.slice(1);
+      diffEl.className = `diff-badge diff-${diff}`;
+
+      // Options
+      const optDiv = document.getElementById('optionsDiv');
+      optDiv.innerHTML = '';
+      const keys = ['A', 'B', 'C', 'D'];
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'option';
+        btn.innerHTML = `<span class="opt-key">${keys[i]}</span><span>${formatInlineCode(opt)}</span>`;
+        btn.onclick = () => handleAnswer(i, btn, q);
+        optDiv.appendChild(btn);
+      });
+
+      // Hide explanation
+      document.getElementById('explanationDiv').classList.remove('show');
+    }
+
+    function handleAnswer(idx, btn, q) {
+      if (answered) return;
+      answered = true;
+
+      const options = document.querySelectorAll('.option');
+      options.forEach(o => o.classList.add('disabled'));
+
+      if (idx === q.correct) {
+        btn.classList.add('correct');
+        sessionStats.correct++;
+      } else {
+        btn.classList.add('wrong');
+        options[q.correct].classList.add('correct');
+        sessionStats.wrong++;
+      }
+
+      sessionStats.total++;
+      saveStats();
+      updateStatsUI();
+      rescheduleNextDailyReminder();
+
+      // Show explanation
+      document.getElementById('explanationText').innerHTML = formatInlineCode(q.explanation);
+      document.getElementById('explanationDiv').classList.add('show');
+
+      // Progress
+      const pct = Math.round((sessionStats.correct / sessionStats.total) * 100);
+      document.getElementById('progressFill').style.width = pct + '%';
+
+      document.getElementById('nextBtn').disabled = false;
+    }
+
+    // ────────────────────────────────────────────────────
+    // NAV
+    // ────────────────────────────────────────────────────
+    function nextQuestion() {
+      generateQuestion();
+    }
+
+    function resetSession() {
+      sessionStats = { total: 0, correct: 0, wrong: 0 };
+      updateStatsUI();
+      document.getElementById('progressFill').style.width = '0%';
+      document.getElementById('explanationDiv').classList.remove('show');
+      document.getElementById('optionsDiv').innerHTML = '';
+      document.getElementById('questionText').textContent = 'Press "Generate Question" to start your quiz 🚀';
+      document.getElementById('nextBtn').disabled = true;
+      const pre = document.querySelector('.q-code');
+      if (pre) pre.remove();
+    }
+
+    function updateStatsUI() {
+      document.getElementById('statTotal').textContent = sessionStats.total;
+      document.getElementById('statCorrect').textContent = sessionStats.correct;
+      document.getElementById('statWrong').textContent = sessionStats.wrong;
+      if (sessionStats.total > 0) {
+        const pct = Math.round((sessionStats.correct / sessionStats.total) * 100);
+        document.getElementById('statPct').textContent = pct + '%';
+      } else {
+        document.getElementById('statPct').textContent = '–';
+      }
+    }
+
+    // ────────────────────────────────────────────────────
+    // HELPERS
+    // ────────────────────────────────────────────────────
+    function setLoading(show) {
+      document.getElementById('loadingDiv').classList.toggle('show', show);
+      document.getElementById('quizSection').style.visibility = show ? 'hidden' : 'visible';
+      document.getElementById('generateBtn').disabled = show;
+    }
+
+    function resetQuestionUI() {
+      document.getElementById('optionsDiv').innerHTML = '';
+      document.getElementById('explanationDiv').classList.remove('show');
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function formatInlineCode(str) {
+      return str.replace(/`([^`]+)`/g, '<code style="font-family:JetBrains Mono,monospace;background:#0a0c10;border:1px solid #252b3d;border-radius:4px;padding:2px 6px;font-size:0.875em;color:#f7c948;">$1</code>');
+    }
+
+    function syntaxHL(code) {
+      const keywords = /\b(const|let|var|function|return|if|else|for|while|class|new|this|import|export|default|extends|super|async|await|try|catch|finally|of|in|typeof|instanceof|null|undefined|true|false|throw|switch|case|break|continue)\b/g;
+      const strings = /(["'`])(?:\\.|(?!\1)[^\\])*\1/g;
+      const comments = /(\/\/.*$|\/\*[\s\S]*?\*\/)/gm;
+      const fns = /\b([a-zA-Z_$][a-zA-Z0-9_$]*)\s*(?=\()/g;
+      const nums = /\b(\d+\.?\d*)\b/g;
+
+      return code
+        .replace(comments, m => `<span class="cm">${m}</span>`)
+        .replace(strings, m => `<span class="str">${m}</span>`)
+        .replace(keywords, m => `<span class="kw">${m}</span>`)
+        .replace(fns, (m, fn) => `<span class="fn">${fn}</span>`)
+        .replace(nums, m => `<span class="num">${m}</span>`);
+    }
+
+    // ────────────────────────────────────────────────────
+    // ALARM / NOTIFICATION (ntfy.sh Integration)
+    // ────────────────────────────────────────────────────
+    function getNextAlarmTime(h, m) {
+      const now = new Date();
+      const target = new Date();
+      target.setHours(h, m, 0, 0);
+      if (target <= now) {
+        target.setDate(target.getDate() + 1);
+      }
+      return target;
+    }
+
+    async function cancelExistingReminder() {
+      // Handled server-side
+    }
+
+    async function scheduleNtfyReminder(h, m) {
+      const topic = settings.ntfyTopic;
+      if (!topic) {
+        showToast("Set your ntfy topic in Settings first!");
+        return;
+      }
+      const streak = document.getElementById('streakNum').textContent || 0;
+      try {
+        const resp = await fetch('/api/schedule', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ topic, hour: h, minute: m, streak })
+        });
+        const data = await resp.json();
+        if (data.ok) {
+          localStorage.setItem('jsQuizAlarmTime', `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+          showToast(`Daily reminder set for ${formatTime(h, m)}!`);
+        } else {
+          showToast(`Failed: ${data.error || 'Unknown error'}`);
+        }
+      } catch (err) {
+        showToast(`Error: ${err.message}`);
+        console.error("Error scheduling reminder:", err);
+      }
+    }
+
+    async function setDailyAlarm() {
+      const val = document.getElementById('alarmTime').value;
+      if (!val) { showToast("⚠️ Pick a time first"); return; }
+      const [h, m] = val.split(':').map(Number);
+
+      if (!settings.ntfyTopic) {
+        showToast("⚙️ Please configure settings first!");
+        toggleSettingsModal(true);
+        return;
+      }
+
+      showToast("⏳ Scheduling phone notification...");
+      await scheduleNtfyReminder(h, m);
+      showToast(`🔔 Daily reminder set! Subscribe to topic: ${settings.ntfyTopic}`);
+    }
+
+    async function sendTestNotification() {
+      const topic = document.getElementById('ntfyTopic').value.trim();
+      if (!topic) {
+        showToast("Set your ntfy topic first!");
+        return;
+      }
+      showToast("Sending test notification...");
+      try {
+        const resp = await fetch('/api/test-notify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ topic })
+        });
+        const data = await resp.json();
+        if (data.ok) {
+          showToast("Test sent! Check your ntfy app.");
+        } else {
+          showToast(`Failed: ${data.error || 'Unknown error'}`);
+        }
+      } catch (err) {
+        showToast(`Error: ${err.message}`);
+      }
+    }
+
+    async function rescheduleNextDailyReminder() {
+      // Handled server-side by Vercel cron — nothing to do here
+    }
+
+    function formatTime(h, m) {
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const hh = h % 12 || 12;
+      return `${hh}:${String(m).padStart(2, '0')} ${ampm}`;
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // ────────────────────────────────────────────────────
+    // INIT
+    // ────────────────────────────────────────────────────
+    buildTopics();
+    loadStats();
+    loadSettings();
+
+    // Auto-restore alarm time
+    try {
+      const saved = localStorage.getItem('jsQuizAlarmTime');
+      if (saved) document.getElementById('alarmTime').value = saved;
+    } catch (_) { }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', e => {
+      const keys = { 'a': 0, 'b': 1, 'c': 2, 'd': 3, 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
+      if (!answered && keys[e.key] !== undefined) {
+        const opts = document.querySelectorAll('.option');
+        if (opts.length > 0) opts[keys[e.key]]?.click();
+      }
+      if (e.key === 'Enter' && answered) nextQuestion();
+      if (e.key === 'g' || e.key === 'G') generateQuestion();
+    });
+  </script>
+</body>
+
+</html>
